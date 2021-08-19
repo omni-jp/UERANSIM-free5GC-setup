@@ -1,1 +1,1 @@
-# UERANSIM-free5gc-setup
+# UERANSIM-free5GC-setup
