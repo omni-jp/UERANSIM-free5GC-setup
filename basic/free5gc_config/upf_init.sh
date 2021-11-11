@@ -2,7 +2,7 @@
 
 export IP_ADDR=$(awk 'END{print $1}' /etc/hosts)
 echo
-echo "gNB IP Address:${IP_ADDR}"
+echo "UPF IP Address:${IP_ADDR}"
 echo
 
 CIDR_ARR=($CIDRS)
