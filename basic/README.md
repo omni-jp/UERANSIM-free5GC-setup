@@ -31,6 +31,13 @@ Creating upf1            ... done
 Creating smf             ... done
 ```
 
+### SIM登録
+
+1. http://<server.address>:5000 にアクセス
+2. admin/free5gc でログイン
+3. SUBSCRIBERSに進み、"New Subscriber"をクリック
+4. 初期値のままで、"Submit"をクリック
+
 
 ### UEを接続
 
