@@ -1,0 +1,279 @@
+version: '3.8'
+
+services:
+  gtp5g_installer:
+    privileged: true
+    container_name: gtp5g_installer
+    image: omnijp/gtp5g_installer
+    volumes:
+      - /lib/modules:/lib/modules
+    healthcheck:
+      test: ["CMD-SHELL", "lsmod | grep gtp5g"]
+      start_period: "10s"
+      retries: 3
+      timeout: "5s"
+      interval: "5s"
+  free5gc-upf-1:
+    container_name: upf1
+    privileged: true
+    image: omnijp/free5gc-upf
+    command: /free5gc/upf_init.sh
+    volumes:
+      - "./free5gc_config/upfcfg1.yaml:/free5gc/config/upfcfg.yaml"
+      - "./free5gc_config/upf_init.sh:/free5gc/upf_init.sh"
+    environment:
+      - CIDRS=${UPF1_CIDRS}
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      net.ipv4.ip_forward: 1
+    depends_on:
+      gtp5g_installer:
+        condition: service_healthy
+    networks:
+      privnet:
+        aliases:
+          - upf1.free5gc.org
+  db:
+    container_name: mongodb
+    image: mongo
+    command: mongod --port 27017
+    expose:
+      - "27017"
+    volumes:
+      - dbdata:/data/db
+    networks:
+      privnet:
+        aliases:
+          - db
+
+  free5gc-nrf:
+    container_name: nrf
+    image: omnijp/free5gc-nrf
+    command: ./nrf -nrfcfg ../config/nrfcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/nrfcfg.yaml:/free5gc/config/nrfcfg.yaml
+    environment:
+      DB_URI: mongodb://db/free5gc
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - nrf.free5gc.org
+    depends_on:
+      - db
+
+  free5gc-amf:
+    container_name: amf
+    image: omnijp/free5gc-amf
+    command: ./amf -amfcfg ../config/amfcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/amfcfg.yaml:/free5gc/config/amfcfg.yaml
+    environment:
+      GIN_MODE: release
+    networks:
+      privnet:
+        ipv4_address: 10.0.0.100
+        aliases:
+          - amf.free5gc.org
+    depends_on:
+      - free5gc-nrf
+
+  free5gc-ausf:
+    container_name: ausf
+    image: omnijp/free5gc-ausf
+    command: ./ausf -ausfcfg ../config/ausfcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/ausfcfg.yaml:/free5gc/config/ausfcfg.yaml
+    environment:
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - ausf.free5gc.org
+    depends_on:
+      - free5gc-nrf
+
+  free5gc-nssf:
+    container_name: nssf
+    image: omnijp/free5gc-nssf
+    command: ./nssf -nssfcfg ../config/nssfcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/nssfcfg.yaml:/free5gc/config/nssfcfg.yaml
+    environment:
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - nssf.free5gc.org
+    depends_on:
+      - free5gc-nrf
+
+  free5gc-pcf:
+    container_name: pcf
+    image: omnijp/free5gc-pcf
+    command: ./pcf -pcfcfg ../config/pcfcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/pcfcfg.yaml:/free5gc/config/pcfcfg.yaml
+    environment:
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - pcf.free5gc.org
+    depends_on:
+      - free5gc-nrf
+
+  free5gc-smf:
+    container_name: smf
+    image: omnijp/free5gc-smf
+    command: ./smf -smfcfg ../config/smfcfg.yaml -uerouting ../config/uerouting.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/smfcfg.yaml:/free5gc/config/smfcfg.yaml
+      - ./free5gc_config/uerouting.yaml:/free5gc/config/uerouting.yaml
+    environment:
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - smf.free5gc.org
+    depends_on:
+      - free5gc-nrf
+      - free5gc-upf-1
+
+  free5gc-udm:
+    container_name: udm
+    image: omnijp/free5gc-udm
+    command: ./udm -udmcfg ../config/udmcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/udmcfg.yaml:/free5gc/config/udmcfg.yaml
+    environment:
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - udm.free5gc.org
+    depends_on:
+      - db
+      - free5gc-nrf
+
+  free5gc-udr:
+    container_name: udr
+    image: omnijp/free5gc-udr
+    command: ./udr -udrcfg ../config/udrcfg.yaml
+    expose:
+      - "8000"
+    volumes:
+      - ./free5gc_config/udrcfg.yaml:/free5gc/config/udrcfg.yaml
+    environment:
+      DB_URI: mongodb://db/free5gc
+      GIN_MODE: release
+    networks:
+      privnet:
+        aliases:
+          - udr.free5gc.org
+    depends_on:
+      - db
+      - free5gc-nrf
+
+        #  free5gc-n3iwf:
+        #    container_name: n3iwf
+        #    build:
+        #      context: ./nf_n3iwf
+        #      args:
+        #        DEBUG_TOOLS: "false"
+        #    command: sh -c "./n3iwf-ipsec.sh && ./n3iwf -n3iwfcfg ../config/n3iwfcfg.yaml"
+        #    volumes:
+        #      - ./free5gc_config/n3iwfcfg.yaml:/free5gc/config/n3iwfcfg.yaml
+        #      - ./free5gc_config/n3iwf-ipsec.sh:/free5gc/n3iwf/n3iwf-ipsec.sh
+        #    environment:
+        #      GIN_MODE: release
+        #    cap_add:
+        #      - NET_ADMIN
+        #    networks:
+        #      privnet:
+        #        aliases:
+        #          - n3iwf.free5gc.org
+        #    depends_on:
+        #      - free5gc-amf
+        #      - free5gc-smf
+        #      - free5gc-upf-b
+
+  free5gc-webui:
+    container_name: webui
+    image: omnijp/free5gc-webui
+    command: ./webui
+    volumes:
+      - ./free5gc_config/webuicfg.yaml:/free5gc/config/webuicfg.yaml
+    environment:
+      - GIN_MODE=release
+    networks:
+      privnet:
+        aliases:
+          - webui
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  ueransim:
+    container_name: ueransim
+    privileged: true
+    image: omnijp/docker_ueransim
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./ueransim_config:/mnt/ueransim
+    expose:
+      - "38412/sctp"
+      - "2152/udp"
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - "/dev/net/tun"
+    networks:
+      privnet:
+    depends_on:
+      - free5gc-amf
+    environment:
+      - MCC=${MCC}
+      - MNC=${MNC}
+      - UE_KEY=${UE_KEY}
+      - UE_OP=${UE_OP}
+      - UE_AMF_AUTH=${UE_AMF_AUTH}
+      - UE_IMEI=${UE_IMEI}
+      - UE_IMEI_SV=${UE_IMEI_SV}
+      - UE_IMSI=${UE_IMSI}
+      - UE_DNN_NAME=${UE_DNN_NAME}
+      - GNB_AMF_IP=${GNB_AMF_IP}
+      - TAC=${TAC}
+      - NSSAI_SST=${NSSAI_SST}
+      - NSSAI_SD=${NSSAI_SD}
+      - APN_NAME=${APN_NAME}
+
+networks:
+  privnet:
+          # driver: macvlan
+          #driver_opts:
+          #  parent: ens160
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.1/24
+
+volumes:
+  dbdata:
