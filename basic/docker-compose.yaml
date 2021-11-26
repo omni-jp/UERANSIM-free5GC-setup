@@ -264,6 +264,14 @@ services:
       - NSSAI_SST=${NSSAI_SST}
       - NSSAI_SD=${NSSAI_SD}
       - APN_NAME=${APN_NAME}
+  tshark:
+    container_name: tshark
+    privileged: true
+    image: omnijp/tshark
+    volumes:
+      - ./pcap:/pcap
+    network_mode: "host"
+    command: -i br-internal -w test.pcap
 
 networks:
   privnet:
@@ -274,6 +282,7 @@ networks:
       driver: default
       config:
         - subnet: 10.0.0.1/24
-
+    driver_opts:
+      com.docker.network.bridge.name: br-internal
 volumes:
   dbdata:
