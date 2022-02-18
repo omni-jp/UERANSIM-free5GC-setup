@@ -1,0 +1,56 @@
+diff -ru ../basic/free5gc_config/smfcfg.yaml free5gc_config/smfcfg.yaml
+--- ../basic/free5gc_config/smfcfg.yaml	2022-02-18 16:42:34.128943043 +0000
++++ free5gc_config/smfcfg.yaml	2022-02-18 17:03:39.596890474 +0000
+@@ -24,6 +24,13 @@
+         - dnn: internet # Data Network Name
+           dns: # the IP address of DNS
+             ipv4: 8.8.8.8
++    - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
++        sst: 1 # Slice/Service Type (uinteger, range: 0~255)
++        sd: 112233 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
++      dnnInfos: # DNN information list
++        - dnn: internet # Data Network Name
++          dns: # the IP address of DNS
++            ipv4: 8.8.8.8
+   plmnList: # the list of PLMN IDs that this SMF belongs to (optional, remove this key when unnecessary)
+     - mcc: "208" # Mobile Country Code (3 digits string, digit: 0~9)
+       mnc: "93" # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+@@ -33,7 +40,7 @@
+     up_nodes: # information of userplane node (AN or UPF)
+       gNB1: # the name of the node
+         type: AN # the type of the node (AN or UPF)
+-      UPF:  # the name of the node
++      UPF1:  # the name of the node
+         type: UPF # the type of the node (AN or UPF)
+         node_id: upf1.free5gc.org # the IP/FQDN of N4 interface on this UPF (PFCP)
+         sNssaiUpfInfos: # S-NSSAI information list for this UPF
+@@ -49,9 +56,27 @@
+             endpoints: # the IP address of this N3/N9 interface on this UPF
+               - upf1.free5gc.org
+             networkInstance: internet # Data Network Name (DNN)
++      UPF2:  # the name of the node
++        type: UPF # the type of the node (AN or UPF)
++        node_id: upf2.free5gc.org # the IP/FQDN of N4 interface on this UPF (PFCP)
++        sNssaiUpfInfos: # S-NSSAI information list for this UPF
++          - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
++              sst: 1 # Slice/Service Type (uinteger, range: 0~255)
++              sd: 112233 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
++            dnnUpfInfoList: # DNN information list for this S-NSSAI
++              - dnn: internet
++                pools:
++                  - cidr: 60.61.0.0/16
++        interfaces: # Interface list for this UPF2
++          - interfaceType: N3 # the type of the interface (N3 or N9)
++            endpoints: # the IP address of this N3/N9 interface on this UPF2
++              - upf2.free5gc.org
++            networkInstance: internet # Data Network Name (DNN)
+     links: # the topology graph of userplane, A and B represent the two nodes of each link
+       - A: gNB1
+-        B: UPF
++        B: UPF1
++      - A: gNB1
++        B: UPF2
+   nrfUri: http://nrf.free5gc.org:8000 # a valid URI of NRF
+   locality: area1 # Name of the location where a set of AMF, SMF and UPFs are located
+ 
+Only in free5gc_config/: upfcfg2.yaml

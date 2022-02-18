@@ -1,0 +1,57 @@
+--- ../basic/docker-compose.yaml	2022-02-18 17:17:48.652855204 +0000
++++ docker-compose.yaml	2022-02-18 17:05:12.244886626 +0000
+@@ -34,6 +34,27 @@
+       privnet:
+         aliases:
+           - upf1.free5gc.org
++  free5gc-upf-2:
++    container_name: upf2
++    privileged: true
++    image: omnijp/free5gc-upf
++    command: /free5gc/upf_init.sh
++    volumes:
++      - "./free5gc_config/upfcfg2.yaml:/free5gc/config/upfcfg.yaml"
++      - "./free5gc_config/upf_init.sh:/free5gc/upf_init.sh"
++    environment:
++      - CIDRS=${UPF2_CIDRS}
++    cap_add:
++      - NET_ADMIN
++    sysctls:
++      net.ipv4.ip_forward: 1
++    depends_on:
++      gtp5g_installer:
++        condition: service_healthy
++    networks:
++      privnet:
++        aliases:
++          - upf2.free5gc.org
+   db:
+     container_name: mongodb
+     image: mongo
+@@ -152,6 +173,7 @@
+     depends_on:
+       - free5gc-nrf
+       - free5gc-upf-1
++      - free5gc-upf-2
+ 
+   free5gc-udm:
+     container_name: udm
+@@ -257,12 +279,15 @@
+       - UE_AMF_AUTH=${UE_AMF_AUTH}
+       - UE_IMEI=${UE_IMEI}
+       - UE_IMEI_SV=${UE_IMEI_SV}
+-      - UE_IMSI=${UE_IMSI}
++      - UE_IMSI1=${UE_IMSI1}
++      - UE_IMSI2=${UE_IMSI2}
+       - UE_DNN_NAME=${UE_DNN_NAME}
+       - GNB_AMF_IP=${GNB_AMF_IP}
+       - TAC=${TAC}
+-      - NSSAI_SST=${NSSAI_SST}
+-      - NSSAI_SD=${NSSAI_SD}
++      - NSSAI_SST1=${NSSAI_SST1}
++      - NSSAI_SD1=${NSSAI_SD1}
++      - NSSAI_SST2=${NSSAI_SST2}
++      - NSSAI_SD2=${NSSAI_SD2}
+       - APN_NAME=${APN_NAME}
+   tshark:
+     container_name: tshark

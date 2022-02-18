@@ -19,7 +19,7 @@ services:
     image: omnijp/free5gc-upf
     command: /free5gc/upf_init.sh
     volumes:
-      - "./free5gc_config/multiUPF/upfcfg01.yaml:/free5gc/config/upfcfg.yaml"
+      - "./free5gc_config/upfcfg1.yaml:/free5gc/config/upfcfg.yaml"
       - "./free5gc_config/upf_init.sh:/free5gc/upf_init.sh"
     environment:
       - CIDRS=${UPF1_CIDRS}
@@ -40,7 +40,7 @@ services:
     image: omnijp/free5gc-upf
     command: /free5gc/upf_init.sh
     volumes:
-      - "./free5gc_config/multiUPF/upfcfg02.yaml:/free5gc/config/upfcfg.yaml"
+      - "./free5gc_config/upfcfg2.yaml:/free5gc/config/upfcfg.yaml"
       - "./free5gc_config/upf_init.sh:/free5gc/upf_init.sh"
     environment:
       - CIDRS=${UPF2_CIDRS}
@@ -162,8 +162,8 @@ services:
     expose:
       - "8000"
     volumes:
-      - ./free5gc_config/multiUPF/smfcfg.yaml:/free5gc/config/smfcfg.yaml
-      - ./free5gc_config/multiUPF/uerouting.yaml:/free5gc/config/uerouting.yaml
+      - ./free5gc_config/smfcfg.yaml:/free5gc/config/smfcfg.yaml
+      - ./free5gc_config/uerouting.yaml:/free5gc/config/uerouting.yaml
     environment:
       GIN_MODE: release
     networks:

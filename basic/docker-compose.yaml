@@ -271,7 +271,7 @@ services:
     volumes:
       - ./pcap:/pcap
     network_mode: "host"
-    command: -i br-internal -w test.pcap
+    command: -i br-internal -a filesize:5000 -w test.pcap
 
 networks:
   privnet:
