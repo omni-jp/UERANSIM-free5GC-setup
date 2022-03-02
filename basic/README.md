@@ -1,6 +1,10 @@
 ## 基本構成
 
-### 必要なDockerイメージを取得
+### 構成図
+
+![img](../docs/images/basic.png)
+
+### 必要な Docker イメージを取得
 
 ```
 docker-compose pull
@@ -31,16 +35,14 @@ Creating upf1            ... done
 Creating smf             ... done
 ```
 
-### SIM登録
+### SIM 登録
 
 1. http://<server.address>:5000 にアクセス
 2. admin/free5gc でログイン
-3. SUBSCRIBERSに進み、"New Subscriber"をクリック
+3. SUBSCRIBERS に進み、"New Subscriber"をクリック
 4. 初期値のままで、"Submit"をクリック
 
-
-### UEを接続
-
+### UE を接続
 
 ```
 ./create_ue_session.sh
@@ -81,7 +83,6 @@ all UEs started
 
 ### 確認
 
-
 ```
 docker exec -it ueransim bash
 ping -I uesimtun0 8.8.8.8
@@ -99,5 +100,3 @@ PING 8.8.8.8 (8.8.8.8) from 60.60.0.1 uesimtun0: 56(84) bytes of data.
 4 packets transmitted, 4 received, 0% packet loss, time 3006ms
 rtt min/avg/max/mdev = 14.574/15.769/16.586/0.842 ms
 ```
-
-

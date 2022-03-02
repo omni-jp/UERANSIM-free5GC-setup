@@ -1,6 +1,10 @@
-## multi UPF構成
+## multi UPF 構成
 
-### 必要なDockerイメージを取得
+### 構成図
+
+![img](../docs/images/multiUPF1.png)
+
+### 必要な Docker イメージを取得
 
 ```
 docker-compose pull
@@ -33,23 +37,22 @@ Creating upf2            ... done
 Creating smf             ... done
 ```
 
-### SIM登録
+### SIM 登録
 
 1. http://<server.address>:5000 にアクセス
 2. admin/free5gc でログイン
-3. SUBSCRIBERSに進み、"New Subscriber"をクリック
+3. SUBSCRIBERS に進み、"New Subscriber"をクリック
 4. 初期値のままで、"Submit"をクリック
-5. 再度"New Subscriber"をクリックしUE2を登録する
-6. SUPIを"208930000000004"と変更して"Submit"をクリック
+5. 再度"New Subscriber"をクリックし UE2 を登録する
+6. SUPI を"208930000000004"と変更して"Submit"をクリック
 
-### UEを接続
-
+### UE を接続
 
 ```
 ./create_ue_session.sh
 ```
 
-2つのUEのIPアドレスがアサインされていることを確認
+2 つの UE の IP アドレスがアサインされていることを確認
 
 ```
 $ ./create_ue_session.sh
@@ -114,7 +117,6 @@ all UEs started
 
 ### 確認
 
-
 ```
 docker exec -it ueransim bash
 ping -I uesimtun0 8.8.8.8 -c 4
@@ -138,4 +140,4 @@ PING 8.8.8.8 (8.8.8.8) from 60.61.0.1 uesimtun0: 56(84) bytes of data.
 
 ```
 
-`pcap/test.pcap`をWireSharkで開き、icmpでフィルタするとuesimtun0とuesimtun1で経路が異なることが確認できる
+`pcap/test.pcap`を WireShark で開き、icmp でフィルタすると uesimtun0 と uesimtun1 で経路が異なることが確認できる
