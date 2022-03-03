@@ -21,3 +21,12 @@ Hands-on では docker-compose を用います. 事前に docker 及び docker-c
 
 - [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 - [Install Docker Compose](https://docs.docker.com/compose/install/)
+
+## docker imageの取得
+
+本リポジトリの[basic](../basic)配下で`docker-compose pull`コマンドを実行し、あらかじめdocker imageをダウンロードしておいてください。
+
+```
+cd UERANSIM-free5GC-setup/basic
+docker-compose pull
+```
