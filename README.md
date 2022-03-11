@@ -8,7 +8,9 @@ Open Mobile Network Infra hands-on#2 の資料保存・公開用のリポジト�
 2. [基本構成](basic/README.md)
 3. [sNSSAI(SST/SD)によるスライス振分け](multiUPF1/README.md)
 
-# Slides
+# Supplementary Material
+
+- [free5GCのアーキテクチャ(構造・特徴)](https://gist.github.com/khirono/73708a361e7646b6b0a6200b67f7f471)
 
 # Acknowledgements
 
